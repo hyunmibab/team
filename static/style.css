@@ -1,0 +1,192 @@
+@font-face {
+  font-family: 'Pretendard-Regular';
+  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- Base ---------------------------------------------------- */
+body{
+  font-family: 'Pretendard-Regular', sans-serif;
+  background:#f9f9f9;
+  margin:0;
+  padding:2rem;
+}
+h1{
+  text-align:center;
+  color:#2d3436;
+  font-size:2rem;
+  font-weight:700;
+  position:relative;
+  display:inline-block;
+  padding-bottom:.4rem;
+  margin-left:5%;
+  margin-right:5%;
+}
+h1::after{
+  content:"";
+  position:absolute;
+  left:0;bottom:0;
+  width:100%;
+  height:4px;
+  border-radius:2px;
+  background:linear-gradient(90deg,#4caf50 0%,#81c784 100%);
+}
+.result-title{
+  font-size:1.25rem;
+  font-weight:600;
+  color:#34495e;
+  border-left:6px solid #4caf50;
+  padding-left:.5rem;
+  margin-bottom:1rem;
+}
+
+/* ---------- Layout -------------------------------------------------- */
+.layout-wrapper{
+  max-width:1400px;
+  margin:0 auto;
+  display:flex;
+  gap:2rem;
+}
+.left-panel{ flex:0 0 320px; }
+.right-panel-wrapper{ flex:1; max-width:none; }
+.right-panel-wrapper>h2{ margin-bottom:1rem; }
+.right-panel{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1rem;
+}
+
+/* ---------- Common Form Elements ------------------------------------ */
+form.upload-form{
+  background:#fff;
+  padding:1rem;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+  margin-bottom:2rem;
+}
+form.upload-form label{ display:block;margin:1rem 0 .5rem; }
+input[type="number"]{
+  width:100%;
+  padding:.5rem;
+  border:1px solid #ccc;
+  border-radius:5px;
+  box-sizing:border-box;
+  margin-bottom:1rem;            /* 인풋–버튼 간 여백 */
+}
+button{
+  width:100%;
+  padding:.7rem;
+  border:none;
+  border-radius:5px;
+  background:#4caf50;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  margin-bottom:1rem;
+}
+
+/* ---------- File Upload --------------------------------------------- */
+.file-upload-area{
+  border:2px dashed #ccc;
+  padding:1rem;
+  text-align:center;
+  border-radius:8px;
+  background:#fff;
+  font-weight:bold;
+  margin-bottom:1rem;
+  cursor:pointer;
+}
+.file-upload-area.filled{
+  border-style:solid;
+  border-color:#4caf50;
+  color:#4caf50;
+}
+.file-upload-area input[type="file"]{ display:none }
+
+/* ---------- Participant List ---------------------------------------- */
+.participant-panel{
+  background:#fff;
+  padding:1rem;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,.05);
+}
+.participant-panel input[type="number"]{
+  width: 150px;
+  display: inline-block;
+  margin-left: 1rem;
+}
+.participant-panel h2{ margin:0;color:#2c3e50 }
+.participant-panel table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:.5rem;
+}
+.participant-panel th,
+.participant-panel td{
+  padding:.5rem;
+  border:1px solid #ddd;
+  text-align:center;
+}
+.participant-panel form{ margin-bottom:.5rem }
+
+/* 스크롤 높이 제한 */
+.scrollable{ max-height:600px;overflow-y:auto }
+
+/* ---------- Team Cards ---------------------------------------------- */
+.team{
+  width:max(240px, 22%);  
+  background:#fff;
+  border-radius:10px;
+  padding:1rem;
+  box-shadow:0 2px 6px rgba(0,0,0,.05);
+  flex-shrink:0;
+  margin-bottom:1.5rem;
+}
+
+.team-head{
+  display:flex;
+  align-items:center;
+  margin-bottom:.4rem;
+}
+.team-title{
+  font-weight:600;font-size:1.8rem;
+}
+
+.team-head .stats{
+  margin-left:auto; 
+  display:flex;
+  gap:.35rem;
+  flex-wrap:wrap;
+}
+
+.badge{
+  padding:.15rem .45rem;
+  border-radius:12px;
+  font-size:.75rem;
+  font-weight:500;
+  color:#fff;
+}
+.badge.total { background:#6c757d }  /* 회색 */
+.badge.male  { background:#3498db }  /* 파랑 */
+.badge.female{ background:#e67e8c }  /* 분홍 */
+
+.avg-age{
+  font-size:.8rem;
+  color:#999;
+  margin:0 0 .5rem;
+}
+
+/* ----- 이름 2열 그리드, 나머지 동일 ------------------------------- */
+.team-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px 10px;
+  list-style:none;
+  padding-left:0;
+  margin:.5rem 0 0;
+}
+.team li{
+  padding:.4rem 0;
+  border-bottom:1px dashed #eee;
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>조 배정 프로그램</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>조 배정 프로그램</h1>
+
+  <!-- 전체 레이아웃: 왼쪽 박스(업로드+참가자), 오른쪽 박스(결과) -->
+  <div class="layout-wrapper">
+
+    <!-- 왼쪽: 업로드 폼 + 참가자 -->
+    <div class="left-panel">
+      <form action="/assign" method="post" enctype="multipart/form-data" class="upload-form" id="upload-form">
+        <label class="file-upload-area" id="file-label">
+          <span id="file-label-text">CSV 파일 업로드</span>
+          <input type="file" name="file" id="file-input" required>
+        </label>
+
+        <label for="team-count">조 개수</label>
+        <input id="team-count" type="number" name="team_count" min="1" required value="{{ team_count or '' }}">
+        <button type="submit">조 배정 시작</button>
+      </form>
+
+        {% if participants %}
+        <div class="participant-panel scrollable">
+            <form action="/reassign" method="post">
+                <label for="team-count-reassign">조 개수 조정</label>
+                <input id="team-count-reassign"
+                    type="number"
+                    name="team_count"
+                    min="1"
+                    value="{{ team_count }}"
+                    required>
+
+                <button type="submit">조 재배정</button>
+
+                <table>
+                <tr><th>이름</th><th>참가여부</th></tr>
+                {% for p in participants %}
+                <tr>
+                    <td>{{ p['이름'] }}</td>
+                    <td>
+                    <input type="checkbox" name="참가자" value="{{ loop.index0 }}"
+                            {% if p['참가여부']|lower == 'true' %}checked{% endif %}>
+                    </td>
+                </tr>
+                {% endfor %}
+                </table>
+
+                {% for p in participants %}
+                <input type="hidden" name="row_{{ loop.index0 }}" value='{{ p | tojson | safe }}'>
+                {% endfor %}
+            </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 오른쪽: 결과 -->
+    {% if teams %}
+    <div class="right-panel-wrapper">
+    <h2 class="result-title">배정 결과 (총 {{ team_count }}조)</h2>
+    <div class="right-panel">
+        {% for team in teams %}
+        <div class="team">
+            <div class="team-head">
+                <span class="team-title">{{ loop.index }}조</span>
+                <div class="stats">
+                    <span class="badge total">{{ team.total }}명</span>
+                    <span class="badge male">👦 {{ team.male }}</span>
+                    <span class="badge female">👧 {{ team.female }}</span>
+                </div>
+            </div>
+            <p class="avg-age">평균 나이 {{ team.avg_age }}</p>
+
+            <ul class="team-grid">
+                {% for person in team.members %}
+                <li>{{ person['이름'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+    {% endif %}
+
+  <!-- 업로드 시 파일 이름 반영 -->
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const fileLabel = document.getElementById('file-label');
+    const labelText = document.getElementById('file-label-text');
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileLabel.classList.add('filled');
+        labelText.textContent = fileInput.files[0].name;
+      } else {
+        fileLabel.classList.remove('filled');
+        labelText.textContent = 'CSV 파일 업로드';
+      }
+    });
+  </script>
+</body>
+</html>
