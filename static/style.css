@@ -1,192 +1,169 @@
-@font-face {
-  font-family: 'Pretendard-Regular';
-  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+:root {
+  /* 1. Refined Color Palette */
+  --c-primary: #7F5AF0; /* 포인트 보라 */
+  --c-primary-light: #9D86F5;
+  --c-bg: #F8F8FA; /* 차분한 배경 */
+  --c-text-dark: #2A2A2A;
+  --c-text-light: #4C4C4C;
+  --c-white: #FFFFFF;
+  --c-border: #EAEAEA;
+  --c-badge-bg: #EAE6FC;
+
+  /* Shadows */
+  --shadow-color: 127, 90, 240; /* --c-primary RGB */
+  --card-shadow: 0 4px 16px rgba(var(--shadow-color), 0.08);
+  --card-hover-shadow: 0 6px 20px rgba(var(--shadow-color), 0.12);
 }
 
-/* ---------- Base ---------------------------------------------------- */
-body{
-  font-family: 'Pretendard-Regular', sans-serif;
-  background:#f9f9f9;
-  margin:0;
-  padding:2rem;
-}
-h1{
-  text-align:center;
-  color:#2d3436;
-  font-size:2rem;
-  font-weight:700;
-  position:relative;
-  display:inline-block;
-  padding-bottom:.4rem;
-  margin-left:5%;
-  margin-right:5%;
-}
-h1::after{
-  content:"";
-  position:absolute;
-  left:0;bottom:0;
-  width:100%;
-  height:4px;
-  border-radius:2px;
-  background:linear-gradient(90deg,#4caf50 0%,#81c784 100%);
-}
-.result-title{
-  font-size:1.25rem;
-  font-weight:600;
-  color:#34495e;
-  border-left:6px solid #4caf50;
-  padding-left:.5rem;
-  margin-bottom:1rem;
+body {
+  font-family: "Pretendard", sans-serif;
+  background-color: var(--c-bg);
+  color: var(--c-text-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---------- Layout -------------------------------------------------- */
-.layout-wrapper{
-  max-width:1400px;
-  margin:0 auto;
-  display:flex;
-  gap:2rem;
-}
-.left-panel{ flex:0 0 320px; }
-.right-panel-wrapper{ flex:1; max-width:none; }
-.right-panel-wrapper>h2{ margin-bottom:1rem; }
-.right-panel{
-  display:flex;
-  flex-wrap:wrap;
-  gap:1rem;
+h1, h2, h4, h5, h6 {
+  color: var(--c-text-dark);
+  font-weight: 600;
 }
 
-/* ---------- Common Form Elements ------------------------------------ */
-form.upload-form{
-  background:#fff;
-  padding:1rem;
-  border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,.05);
-  margin-bottom:2rem;
-}
-form.upload-form label{ display:block;margin:1rem 0 .5rem; }
-input[type="number"]{
-  width:100%;
-  padding:.5rem;
-  border:1px solid #ccc;
-  border-radius:5px;
-  box-sizing:border-box;
-  margin-bottom:1rem;            /* 인풋–버튼 간 여백 */
-}
-button{
-  width:100%;
-  padding:.7rem;
-  border:none;
-  border-radius:5px;
-  background:#4caf50;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  margin-bottom:1rem;
+h1.display-5 {
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
-/* ---------- File Upload --------------------------------------------- */
-.file-upload-area{
-  border:2px dashed #ccc;
-  padding:1rem;
-  text-align:center;
-  border-radius:8px;
-  background:#fff;
-  font-weight:bold;
-  margin-bottom:1rem;
-  cursor:pointer;
-}
-.file-upload-area.filled{
-  border-style:solid;
-  border-color:#4caf50;
-  color:#4caf50;
-}
-.file-upload-area input[type="file"]{ display:none }
-
-/* ---------- Participant List ---------------------------------------- */
-.participant-panel{
-  background:#fff;
-  padding:1rem;
-  border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,.05);
-}
-.participant-panel input[type="number"]{
-  width: 150px;
-  display: inline-block;
-  margin-left: 1rem;
-}
-.participant-panel h2{ margin:0;color:#2c3e50 }
-.participant-panel table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:.5rem;
-}
-.participant-panel th,
-.participant-panel td{
-  padding:.5rem;
-  border:1px solid #ddd;
-  text-align:center;
-}
-.participant-panel form{ margin-bottom:.5rem }
-
-/* 스크롤 높이 제한 */
-.scrollable{ max-height:600px;overflow-y:auto }
-
-/* ---------- Team Cards ---------------------------------------------- */
-.team{
-  width:max(240px, 22%);  
-  background:#fff;
-  border-radius:10px;
-  padding:1rem;
-  box-shadow:0 2px 6px rgba(0,0,0,.05);
-  flex-shrink:0;
-  margin-bottom:1.5rem;
+/* 2. Cleaner Card Styles */
+.card {
+  border: 1px solid var(--c-border);
+  border-radius: 0.75rem;
+  box-shadow: none;
+  transition: all 0.3s ease-in-out;
+  background-color: var(--c-white);
 }
 
-.team-head{
-  display:flex;
-  align-items:center;
-  margin-bottom:.4rem;
-}
-.team-title{
-  font-weight:600;font-size:1.8rem;
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow);
 }
 
-.team-head .stats{
-  margin-left:auto; 
-  display:flex;
-  gap:.35rem;
-  flex-wrap:wrap;
+/* 3. Refined Button Styles */
+.btn {
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  transition: all 0.2s ease-in-out;
 }
 
-.badge{
-  padding:.15rem .45rem;
-  border-radius:12px;
-  font-size:.75rem;
-  font-weight:500;
-  color:#fff;
+.btn-primary {
+  background-color: var(--c-primary);
+  color: var(--c-white);
 }
-.badge.total { background:#6c757d }  /* 회색 */
-.badge.male  { background:#3498db }  /* 파랑 */
-.badge.female{ background:#e67e8c }  /* 분홍 */
-
-.avg-age{
-  font-size:.8rem;
-  color:#999;
-  margin:0 0 .5rem;
+.btn-primary:hover {
+  background-color: var(--c-primary-light);
 }
 
-/* ----- 이름 2열 그리드, 나머지 동일 ------------------------------- */
-.team-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:4px 10px;
-  list-style:none;
-  padding-left:0;
-  margin:.5rem 0 0;
+.btn-success {
+  background-color: var(--c-badge-bg);
+  color: var(--c-primary);
 }
-.team li{
-  padding:.4rem 0;
-  border-bottom:1px dashed #eee;
+.btn-success:hover {
+  background-color: #DCD7F9;
+}
+
+.edit-list-btn {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  background-color: transparent;
+  border: 1px solid var(--c-primary);
+  color: var(--c-primary);
+}
+.edit-list-btn:hover {
+  background-color: var(--c-primary);
+  color: var(--c-white);
+}
+
+.participant-list-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+  border: 1px solid var(--c-border);
+  border-radius: 0.5rem;
+}
+
+.table thead th {
+  background-color: #F8F8FA;
+}
+
+/* 4. Improved Team Card Design */
+.team-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.team-card {
+  background: var(--c-white);
+  border: 1px solid var(--c-border);
+  box-shadow: var(--card-shadow);
+}
+
+.team-card .card-title {
+  margin-bottom: 0;
+  font-weight: 700;
+  color: var(--c-text-dark);
+}
+
+.team-card .badge {
+  padding: 0.4em 0.65em;
+  font-size: 0.85rem;
+  line-height: 1;
+  border-radius: var(--bs-border-radius-sm);
+  background-color: var(--c-badge-bg);
+  color: var(--c-primary);
+  border: 1px solid #E0D9F7;
+}
+
+.team-card .copy-btn {
+  padding: 0.4em 0.65em;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--c-primary);
+  background-color: var(--c-white);
+  border: 1px solid var(--c-border);
+}
+.team-card .copy-btn:hover {
+  background-color: #f8f8fa;
+}
+
+.copy-btn .bi-check-lg {
+  color: var(--c-primary);
+}
+
+.team-card .list-group-item {
+  padding: 0.6rem 0;
+  border: none;
+  border-bottom: 1px solid var(--c-border);
+  background-color: transparent;
+  color: var(--c-text-light);
+  font-size: 0.95rem; /* Slightly smaller font for compactness */
+  font-weight: 500;
+}
+
+.team-card .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.25rem 1rem;
+  list-style: none;
+  padding: 0;
+}
+
+.badge i {
+  vertical-align: -0.125em;
 }

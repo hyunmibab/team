@@ -1,105 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>조 배정 프로그램</title>
+  <link rel="icon" href="/logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <h1>조 배정 프로그램</h1>
+  <div class="container my-5">
+    <header class="text-center mb-5">
+      <h1 class="display-5">조 배정 프로그램</h1>
+    </header>
 
-  <!-- 전체 레이아웃: 왼쪽 박스(업로드+참가자), 오른쪽 박스(결과) -->
-  <div class="layout-wrapper">
-
-    <!-- 왼쪽: 업로드 폼 + 참가자 -->
-    <div class="left-panel">
-      <form action="/assign" method="post" enctype="multipart/form-data" class="upload-form" id="upload-form">
-        <label class="file-upload-area" id="file-label">
-          <span id="file-label-text">CSV 파일 업로드</span>
-          <input type="file" name="file" id="file-input" required>
-        </label>
-
-        <label for="team-count">조 개수</label>
-        <input id="team-count" type="number" name="team_count" min="1" required value="{{ team_count or '' }}">
-        <button type="submit">조 배정 시작</button>
-      </form>
+    <div class="row g-5">
+      <!-- 왼쪽 패널: 설정 및 참가자 목록 -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">설정</h5>
+            <div class="mb-3">
+              <label for="team-count" class="form-label">조 개수</label>
+              <input id="team-count" type="number" class="form-control" min="1" required value="{{ team_count or '4' }}">
+            </div>
+            <form action="/assign" method="post" enctype="multipart/form-data" id="upload-form">
+              <div class="mb-3">
+                <label for="file-input" class="form-label">참가자 명단 (CSV)</label>
+                <input class="form-control" type="file" name="file" id="file-input" accept=".csv" required>
+                <div id="file-feedback" class="form-text mt-2"></div>
+              </div>
+              <div class="d-grid">
+                <button type="submit" id="assign-btn" class="btn btn-primary">
+                  <i class="bi bi-play-circle-fill me-2"></i>조 배정 시작
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
 
         {% if participants %}
-        <div class="participant-panel scrollable">
-            <form action="/reassign" method="post">
-                <label for="team-count-reassign">조 개수 조정</label>
-                <input id="team-count-reassign"
-                    type="number"
-                    name="team_count"
-                    min="1"
-                    value="{{ team_count }}"
-                    required>
-
-                <button type="submit">조 재배정</button>
-
-                <table>
-                <tr><th>이름</th><th>참가여부</th></tr>
-                {% for p in participants %}
-                <tr>
-                    <td>{{ p['이름'] }}</td>
-                    <td>
-                    <input type="checkbox" name="참가자" value="{{ loop.index0 }}"
-                            {% if p['참가여부']|lower == 'true' %}checked{% endif %}>
-                    </td>
-                </tr>
-                {% endfor %}
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">참가자 명단</h5>
+              <a href="/edit/{{ token }}" class="btn btn-sm btn-outline-primary edit-list-btn">
+                <i class="bi bi-pencil-square me-1"></i>명단 편집
+              </a>
+            </div>
+             <div class="d-flex justify-content-end align-items-center mb-2">
+                <span id="participant-counter" class="badge bg-secondary fw-normal"></span>
+            </div>
+            <form action="/api/reassign" method="post" id="reassign-form">
+              <input type="hidden" name="team_count" id="reassign-team-count">
+              <div class="participant-list-wrapper">
+                <table class="table table-striped table-hover">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th class="text-center">참가</th>
+                      <th>이름</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for p in participants %}
+                    <tr>
+                      <td class="text-center">
+                        <input class="form-check-input participant-checkbox" type="checkbox" name="참가자" value="{{ loop.index0 }}" {% if p.get('참가여부')|lower == 'true' %}checked{% endif %}>
+                      </td>
+                      <td>{{ p.get('이름', '') }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
                 </table>
+              </div>
 
-                {% for p in participants %}
-                <input type="hidden" name="row_{{ loop.index0 }}" value='{{ p | tojson | safe }}'>
-                {% endfor %}
+              {% for p in participants %}
+              <input type="hidden" name="row_{{ loop.index0 }}" value='{{ p | tojson | safe }}'>
+              {% endfor %}
+              
+              <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-success">
+                  <i class="bi bi-arrow-repeat me-2"></i>조 재배정
+                </button>
+              </div>
             </form>
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- 오른쪽: 결과 -->
-    {% if teams %}
-    <div class="right-panel-wrapper">
-    <h2 class="result-title">배정 결과 (총 {{ team_count }}조)</h2>
-    <div class="right-panel">
-        {% for team in teams %}
-        <div class="team">
-            <div class="team-head">
-                <span class="team-title">{{ loop.index }}조</span>
-                <div class="stats">
-                    <span class="badge total">{{ team.total }}명</span>
-                    <span class="badge male">👦 {{ team.male }}</span>
-                    <span class="badge female">👧 {{ team.female }}</span>
-                </div>
-            </div>
-            <p class="avg-age">평균 나이 {{ team.avg_age }}</p>
-
-            <ul class="team-grid">
-                {% for person in team.members %}
-                <li>{{ person['이름'] }}</li>
-                {% endfor %}
-            </ul>
+          </div>
         </div>
-        {% endfor %}
-    </div>
-    </div>
-    {% endif %}
+        {% endif %}
+      </div>
 
-  <!-- 업로드 시 파일 이름 반영 -->
+      <!-- 오른쪽 패널: 결과 -->
+      <div class="col-lg-8" id="results-panel">
+        {% if teams %}
+        <h2 class="result-title mb-4">배정 결과 (총 {{ team_count }}조)</h2>
+        <div class="team-container">
+          {% for team in teams %}
+          <div class="card h-100 shadow-sm team-card">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex align-items-center mb-3">
+                <h4 class="card-title team-title me-auto">{{ loop.index }}조</h4>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge text-bg-secondary"><i class="bi bi-people-fill me-1"></i>{{ team.total }}</span>
+                    <span class="badge text-bg-primary"><i class="bi bi-gender-male me-1"></i>{{ team.male }}</span>
+                    <span class="badge text-bg-danger"><i class="bi bi-gender-female me-1"></i>{{ team.female }}</span>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" data-team-name="{{ loop.index }}조" data-team-members="{{ team.members|map(attribute='이름')|join(', ') }}">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+              </div>
+              <div class="team-grid-wrapper mt-auto">
+                <ul class="list-group list-group-flush team-grid">
+                  {% for person in team.members %}
+                  <li class="list-group-item">{{ person['이름'] }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center p-5 bg-light rounded d-flex align-items-center justify-content-center" style="height: 100%;">
+          <div>
+            <i class="bi bi-people-fill" style="font-size: 4rem; color: #ccc;"></i>
+            <p class="lead text-muted mt-3">참가자 명단을 업로드하고<br>조 개수를 설정한 후 '조 배정 시작' 버튼을 누르세요.</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const fileInput = document.getElementById('file-input');
-    const fileLabel = document.getElementById('file-label');
-    const labelText = document.getElementById('file-label-text');
+    document.addEventListener('DOMContentLoaded', function () {
+      const teamCountInput = document.getElementById('team-count');
+      const fileInput = document.getElementById('file-input');
+      const assignBtn = document.getElementById('assign-btn');
+      const fileFeedback = document.getElementById('file-feedback');
+      const uploadForm = document.getElementById('upload-form');
+      const reassignForm = document.getElementById('reassign-form');
+      const resultsPanel = document.getElementById('results-panel');
+      const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+      const participantCounter = document.getElementById('participant-counter');
+      const totalParticipants = {{ participants | length if participants else 0 }};
 
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length > 0) {
-        fileLabel.classList.add('filled');
-        labelText.textContent = fileInput.files[0].name;
-      } else {
-        fileLabel.classList.remove('filled');
-        labelText.textContent = 'CSV 파일 업로드';
+      // 파일 업로드 유효성 검사
+      fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+          if (file.name.endsWith('.csv')) {
+            fileFeedback.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> ${file.name}</span>`;
+            assignBtn.disabled = false;
+          } else {
+            fileFeedback.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> CSV 파일만 업로드할 수 있습니다.</span>`;
+            assignBtn.disabled = true;
+          }
+        } else {
+          fileFeedback.textContent = '';
+          assignBtn.disabled = false;
+        }
+      });
+
+      // 조 배정 시작 시 team_count 값 전달
+      if (uploadForm) {
+        uploadForm.addEventListener('submit', function() {
+          const teamCountHiddenInput = document.createElement('input');
+          teamCountHiddenInput.type = 'hidden';
+          teamCountHiddenInput.name = 'team_count';
+          teamCountHiddenInput.value = teamCountInput.value;
+          uploadForm.appendChild(teamCountHiddenInput);
+        });
       }
+
+      // 동적 조 재배정
+      if (reassignForm) {
+        reassignForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const reassignBtn = reassignForm.querySelector('button[type="submit"]');
+          const originalBtnContent = reassignBtn.innerHTML;
+          reassignBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 재배정 중...`;
+          reassignBtn.disabled = true;
+
+          document.getElementById('reassign-team-count').value = teamCountInput.value;
+          const formData = new FormData(reassignForm);
+
+          fetch('/api/reassign', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => renderResults(data))
+            .catch(error => {
+              console.error('Error:', error);
+              alert('오류가 발생했습니다. 다시 시도해주세요.');
+            })
+            .finally(() => {
+              reassignBtn.innerHTML = originalBtnContent;
+              reassignBtn.disabled = false;
+            });
+        });
+      }
+
+      // 참가자 카운터 업데이트
+      function updateCounter() {
+        if (!participantCounter) return;
+        const checkedCount = document.querySelectorAll('.participant-checkbox:checked').length;
+        participantCounter.textContent = `참가: ${checkedCount} / ${totalParticipants} 명`;
+      }
+      participantCheckboxes.forEach(checkbox => checkbox.addEventListener('change', updateCounter));
+      updateCounter();
+
+      // 결과 렌더링 함수
+      function renderResults(data) {
+        let resultsHtml = '';
+        if (data.teams && data.teams.length > 0) {
+          resultsHtml += `<h2 class="result-title mb-4">배정 결과 (총 ${data.team_count}조)</h2>`;
+          resultsHtml += '<div class="team-container">';
+          data.teams.forEach((team, index) => {
+            const teamName = `${index + 1}조`;
+            const teamMembers = team.members.map(p => p['이름']).join(', ');
+            resultsHtml += `
+              <div class="card h-100 shadow-sm team-card">
+                <div class="card-body d-flex flex-column">
+                  <div class="d-flex align-items-center mb-3">
+                    <h4 class="card-title team-title me-auto">${teamName}</h4>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge text-bg-secondary"><i class="bi bi-people-fill me-1"></i>${team.total}</span>
+                      <span class="badge text-bg-primary"><i class="bi bi-gender-male me-1"></i>${team.male}</span>
+                      <span class="badge text-bg-danger"><i class="bi bi-gender-female me-1"></i>${team.female}</span>
+                      <button class="btn btn-sm btn-outline-secondary copy-btn" data-team-name="${teamName}" data-team-members="${teamMembers}">
+                        <i class="bi bi-clipboard"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="team-grid-wrapper mt-auto">
+                    <ul class="list-group list-group-flush team-grid">
+                      ${team.members.map(person => `<li class="list-group-item">${person['이름']}</li>`).join('')}
+                    </ul>
+                  </div>
+                </div>
+              </div>`;
+          });
+          resultsHtml += '</div>';
+        } else {
+          resultsHtml = `
+            <div class="text-center p-5 bg-light rounded d-flex align-items-center justify-content-center" style="height: 100%;">
+              <div>
+                <i class="bi bi-people-fill" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="lead text-muted mt-3">결과가 없습니다.</p>
+              </div>
+            </div>`;
+        }
+        resultsPanel.innerHTML = resultsHtml;
+        addCopyButtonListeners();
+      }
+
+      // 복사 버튼 이벤트 리스너 추가
+      function addCopyButtonListeners() {
+        document.querySelectorAll('.copy-btn').forEach(button => {
+          button.addEventListener('click', function() {
+            const teamName = this.dataset.teamName;
+            const teamMembers = this.dataset.teamMembers;
+            const textToCopy = `[${teamName}]\n${teamMembers}`;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+              const originalIcon = this.innerHTML;
+              this.innerHTML = '<i class="bi bi-check-lg"></i>';
+              setTimeout(() => { this.innerHTML = originalIcon; }, 1500);
+            }).catch(err => {
+              console.error('Copy failed', err);
+              alert('복사에 실패했습니다.');
+            });
+          });
+        });
+      }
+      
+      addCopyButtonListeners();
     });
   </script>
 </body>
